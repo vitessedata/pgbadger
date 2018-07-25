@@ -2682,15 +2682,16 @@ sub process_file
 				# We received a signal
 				last CSVLOOP if ($terminate);
 
-				# Number of columns in csvlog (22 before 9.0 and 23 from 9.0 to current)
-				next if ( ($#{$row} != 22) && ($#{$row} != 21) );
+				# Number of columns in csvlog (29 to deepgreen ) (22 before 9.0 and 23 from 9.0 to current)
+				next if ( ($#{$row} != 29) && ($#{$row} != 30) );
+
 
 				# Set progress statistics
 				$cursize += length(join(',', @$row));
 				$nlines++;
 				&update_progress_bar($tmpoutfile, $nlines, $stop_offset, $totalsize, \$cursize, \$old_queries_count, \$old_errors_count);
 
-				next if ( ($row->[11] !~ $parse_regex)  || ($row->[11] eq 'LOCATION'));
+				next if ( ($row->[16] !~ $parse_regex)  || ($row->[16] eq 'LOCATION'));
 
 				# Extract the date
 				if ($row->[0] =~ m/^(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)\.(\d+)/) {
@@ -2721,20 +2722,20 @@ sub process_file
 					$prefix_vars{'t_dbuser'}  = $row->[1] || '';
 					$prefix_vars{'t_dbname'}  = $row->[2] || '';
 					$prefix_vars{'t_appname'} = $row->[22] || '';
-					$prefix_vars{'t_client'}  = $row->[4] || '';
+					$prefix_vars{'t_client'}  = $row->[5] || '';
 					$prefix_vars{'t_client'}  =~ s/:.*//;
 					$prefix_vars{'t_client'} = _gethostbyaddr($prefix_vars{'t_client'}) if ($dns_resolv);
 					$prefix_vars{'t_host'}    = 'csv'; # this unused variable is used to store format information when log format is not syslog
 					$prefix_vars{'t_pid'}     = $row->[3];
-					$prefix_vars{'t_session_line'} = $row->[5];
-					$prefix_vars{'t_session_line'} =~ s/\..*//;
-					$prefix_vars{'t_loglevel'} = $row->[11];
-					$prefix_vars{'t_query'}    = $row->[13];
+					$prefix_vars{'t_session_line'} = $row->[9];
+					# $prefix_vars{'t_session_line'} =~ s/\..*//;
+					$prefix_vars{'t_loglevel'} = $row->[16];
+					$prefix_vars{'t_query'}    = $row->[18];
 					# Set ERROR additional information
-					$prefix_vars{'t_detail'} = $row->[14];
-					$prefix_vars{'t_hint'} = $row->[15];
-					$prefix_vars{'t_context'} = $row->[18];
-					$prefix_vars{'t_statement'} = $row->[19];
+					$prefix_vars{'t_detail'} = $row->[19];
+					$prefix_vars{'t_hint'} = $row->[20];
+					$prefix_vars{'t_context'} = $row->[23];
+					$prefix_vars{'t_statement'} = $row->[21];
 
 					# Check if the log line should be excluded from the report
 					if (&validate_log_line($prefix_vars{'t_pid'})) {
